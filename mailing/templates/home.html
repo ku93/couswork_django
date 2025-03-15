@@ -1,0 +1,9 @@
+{% extends 'client/base.html' %}
+{% block title %} Главная {% endblock %}
+{% block content %}
+<h1 class="text-center">Сервис управления рассылками</h1>
+<p class="text-center">Добро пожаловать на главную страницу сервиса!</p>
+<p>Общее количество рассылок: {{ total_mailings }}</p>
+<p>Количество активных рассылок: {{ active_mailings }}</p>
+<p>Количество уникальных получателей: {{ unique_recipients }}</p>
+{% endblock %}

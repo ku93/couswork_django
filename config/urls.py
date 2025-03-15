@@ -5,8 +5,10 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('client.urls', namespace='client')),
+    path('', include('mailing.urls', namespace='mailing')),
+    path('client/', include('client.urls', namespace='client')),
     path('communication/', include('communication.urls', namespace = 'communication')),
+
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
