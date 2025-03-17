@@ -7,6 +7,16 @@
             <a class="nav-link" href="{% url 'mailing:mailing_list' %}">Список рассылок</a>
             <a class="nav-link" href="{% url 'communication:communication_list' %}">Шаблоны сообщений</a>
         </div>
+        <div class="ml-auto">
+            {% if user.is_authenticated %}
+                <span class="navbar-text text-white">
+                    {{ user.email|slice:":5" }}...
+                </span>
+                <a class="nav-link text-white" href="{% url 'users:logout' %}">Выход</a>
+            {% else %}
+                <a class="nav-link text-white" href="{% url 'users:login' %}">Вход</a>
+            {% endif %}
+        </div>
     </div>
 </nav>
 

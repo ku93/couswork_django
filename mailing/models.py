@@ -2,6 +2,7 @@ from django.db import models
 
 from client.models import Client
 from communication.models import Communication
+from users.models import User
 
 
 class Mailing(models.Model):
@@ -52,3 +53,17 @@ class MailingAttempt(models.Model):
 
     def __str__(self):
         return f'{self.timestamp} - {self.status}'
+
+
+class EmailStatistics(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    successful_attempts = models.IntegerField(default=0)
+    failed_attempts = models.IntegerField(default=0)
+    total_sent = models.IntegerField(default=0)
+
+    class Metta:
+        verbose_name = 'Статистика рассылки'
+        verbose_name_plural = 'Статистики рассылки'
+
+    def __str__(self):
+        return f"Статистика для {self.user.email}"

@@ -2,14 +2,13 @@ import os
 
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.shortcuts import redirect, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from django.core.mail import send_mail
 from django.contrib import messages
 
 
 from client.models import Client
-from communication.models import Communication
-from mailing.models import Mailing
+from mailing.models import Mailing, EmailStatistics
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -73,3 +72,10 @@ class HomeView(View):
         }
 
         return render(request, 'home.html', context)
+
+class EmailStatisticsView(ListView):
+    model = EmailStatistics
+    template_name = "email_statistics.html"
+
+    def get_queryset(self):
+        return EmailStatistics.objects.filter(user=self.request.user)

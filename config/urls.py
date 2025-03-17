@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('mailing.urls', namespace='mailing')),
     path('client/', include('client.urls', namespace='client')),
     path('communication/', include('communication.urls', namespace = 'communication')),
+    path('users/', include('users.urls', namespace='urls'))
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
