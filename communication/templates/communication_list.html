@@ -2,8 +2,9 @@
 {% load static %}
 {% block title %} Список сообщений {% endblock %}
 {% block content %}
-<h1 class="text-center mt-3">Список сообщений</h1>
 
+<h1 class="text-center mt-3">Список сообщений</h1>
+{% if user.is_authenticated %}
 {% if object_list %}
 <table class="table table-bordered">
     <thead>
@@ -37,4 +38,7 @@
 <div class="text-center mt-3">
     <a class="btn btn-secondary text-white" href="{% url 'communication:communication_create' %}">Создать новое сообщение</a>
 </div>
+{% else %}
+    <p>Пожалуйста, <a href="{% url 'users:login' %}">войдите</a>, чтобы увидеть список своих сообщений.</p>
+{% endif %}
 {% endblock %}
