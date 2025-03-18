@@ -27,6 +27,7 @@ class Mailing(models.Model):
         verbose_name="Дата последнего изменения",
         help_text="Дата последнего изменения продукта",
     )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mailings', verbose_name='Владелец')
 
     class Metta:
         verbose_name = 'Рассылка'
