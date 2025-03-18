@@ -1,0 +1,17 @@
+{% extends 'client/base.html' %}
+{% block title %}Сообщение{% endblock %}
+{% block content %}
+
+<h1 class="text-center">{{ object.topic }}</h1>
+<p>Текст сообщения: {{ object.links }}</p>
+
+<div class="mt-4">
+    <a class="btn btn-outline-primary" href="{% url 'communication:communication_update' object.pk %}" role="button">Редактировать</a>
+    <a class="btn btn-outline-danger" href="{% url 'communication:communication_delete' object.pk %}" role="button">Удалить</a>
+</div>
+
+
+<p>Последнее изменение: {{ object.updated_at }}</p>
+<p>Добавлено: {{ object.created_at }}</p>
+
+{% endblock %}

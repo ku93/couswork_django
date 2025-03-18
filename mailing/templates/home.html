@@ -1,0 +1,30 @@
+{% extends 'client/base.html' %}
+{% block title %} Главная {% endblock %}
+{% block content %}
+<h1 class="text-center">Сервис управления рассылками</h1>
+<p class="text-center">Добро пожаловать на главную страницу сервиса!</p>
+<p>Общее количество рассылок: {{ total_mailings }}</p>
+<p>Количество активных рассылок: {{ active_mailings }}</p>
+<p>Количество уникальных получателей: {{ unique_recipients }}</p>
+{% if user.is_authenticated %}
+<h3>Статистика рассылок</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Успешные попытки</th>
+            <th>Неуспешные попытки</th>
+            <th>Всего отправлено</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ object.successful_attempts }}</td>
+            <td>{{ object.failed_attempts }}</td>
+            <td>{{ object.total_sent }}</td>
+        </tr>
+    </tbody>
+</table>
+{% else %}
+    <p>Пожалуйста, <a href="{% url 'users:login' %}">войдите</a>, чтобы увидеть свою статистику.</p>
+{% endif %}
+{% endblock %}
