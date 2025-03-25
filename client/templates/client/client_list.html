@@ -1,0 +1,50 @@
+{% extends 'client/base.html' %}
+{% load static %}
+{% block title %} Список клиентов {% endblock %}
+{% block content %}
+
+<h1 class="text-center mt-3">Список клиентов</h1>
+{% if user.is_authenticated %}
+{% if object_list %}
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Ф.И.О.</th>
+        <th>e-mail</th>
+        <th>Последнее изменение</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for client in object_list %}
+    <tr>
+        <td>
+            {% if client.picture %}
+            <img src="{{ client.picture.url }}" class="img-fluid" alt="{{ client.name }}"
+                 style="height: 50px; object-fit: cover; display: inline-block; margin-right: 10px;">
+            {% endif %}
+            {{ client.name }}
+        </td>
+        <td>
+            <a href="mailto:{{ client.email }}">{{ client.email }}</a>
+        </td>
+        <td>
+            <small>Последнее изменение: {{ client.updated_at|timesince }} назад</small>
+            <span class="text-primary" style="cursor: pointer;"
+                  onclick="window.location.href='{% url 'client:client_detail' client.pk %}'">Подробнее</span>
+
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-center">К сожалению, список клиентов пуст.</p>
+{% endif %}
+<div class="text-center mt-3">
+    <a class="btn btn-secondary text-white" href="{% url 'client:client_create' %}">Создать нового клиента</a>
+
+</div>
+{% else %}
+<p>Пожалуйста, <a href="{% url 'users:login' %}">войдите</a>, чтобы увидеть список своих клиентов.</p>
+{% endif %}
+{% endblock %}

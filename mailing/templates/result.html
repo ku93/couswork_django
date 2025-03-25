@@ -1,0 +1,7 @@
+{% extends 'client/base.html' %}
+{% block title %}Результат рассылки {{ object.communication.name }}{% endblock %}
+{% block content %}
+<h1>Результат рассылки</h1>
+    <p>{{ message }}</p>
+    <a href="{% url 'mailing:mailing_list' %}">Вернуться к списку рассылок</a>
+{% endblock %}

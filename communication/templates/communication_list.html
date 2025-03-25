@@ -1,0 +1,44 @@
+{% extends 'client/base.html' %}
+{% load static %}
+{% block title %} Список сообщений {% endblock %}
+{% block content %}
+
+<h1 class="text-center mt-3">Список сообщений</h1>
+{% if user.is_authenticated %}
+{% if object_list %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Тема</th>
+            <th>Сообщение</th>
+            <th>Последнее изменение</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for communication in object_list %}
+        <tr>
+            <td>
+                {{ communication.topic }}
+            </td>
+            <td>
+                {{ communication.links }}
+            </td>
+            <td>
+                <small>Последнее изменение: {{ communication.updated_at|timesince }} назад</small>
+                <a class="text-primary" href="{% url 'communication:communication_detail' communication.id %}" style="cursor: pointer;">Подробнее</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p class="text-center">К сожалению, список сообщений пуст.</p>
+{% endif %}
+
+<div class="text-center mt-3">
+    <a class="btn btn-secondary text-white" href="{% url 'communication:communication_create' %}">Создать новое сообщение</a>
+</div>
+{% else %}
+    <p>Пожалуйста, <a href="{% url 'users:login' %}">войдите</a>, чтобы увидеть список своих сообщений.</p>
+{% endif %}
+{% endblock %}
