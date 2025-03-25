@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView
 
 from client.models import Client
@@ -57,11 +57,11 @@ class UserCreatorView(CreateView):
     @login_required
     def block_user(request, user_id):
         if not can_block_users(request.user):
-            return redirect('unauthorized')
+            return redirect("unauthorized")
         user = get_object_or_404(User, id=user_id)
         user.is_blocked = True
         user.save()
-        return redirect('user_list')
+        return redirect("user_list")
 
 
 def email_verification(request, token):
@@ -71,17 +71,22 @@ def email_verification(request, token):
     user.save()
     return redirect(reverse("users:login"))
 
+
 def can_view_all_clients(user):
-    return user.role == 'manager'
+    return user.role == "manager"
+
 
 def can_view_all_mailings(user):
-    return user.role == 'manager'
+    return user.role == "manager"
+
 
 def can_block_users(user):
-    return user.role == 'manager'
+    return user.role == "manager"
+
 
 def can_disable_mailings(user):
-    return user.role == 'manager'
+    return user.role == "manager"
+
 
 @login_required
 def client_list(request):
@@ -89,6 +94,4 @@ def client_list(request):
         clients = Client.objects.all()
     else:
         clients = Client.objects.filter(created_by=request.user)
-    return render(request, 'client_list.html', {'clients': clients})
-
-
+    return render(request, "client_list.html", {"clients": clients})
