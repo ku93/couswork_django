@@ -29,6 +29,14 @@ class MailingListView(ListView):
         return render(request, "mailing_list.html", {"mailings": mailings})
 
 
+    @login_required
+    def mailing_list(request):
+        if can_view_all_mailings(request.user):
+            mailings = Mailing.objects.all()
+        else:
+            mailings = Mailing.objects.filter(created_by=request.user)
+        return render(request, 'mailing_list.html', {'mailings': mailings})
+
 class MailingDetailView(DetailView):
     model = Mailing
     template_name = "mailing_detail.html"
@@ -42,6 +50,15 @@ class MailingDetailView(DetailView):
         mailing.save()
         return redirect("mailing_list")
 
+
+    @login_required
+    def disable_mailing(request, mailing_id):
+        if not can_disable_mailings(request.user):
+            return redirect('unauthorized')
+        mailing = get_object_or_404(Mailing, id=mailing_id)
+        mailing.is_active = False
+        mailing.save()
+        return redirect('mailing_list')
 
 class MailingCreateView(CreateView):
     model = Mailing
@@ -60,6 +77,15 @@ class MailingCreateView(CreateView):
             return redirect("mailing_list")
         return render(request, "create_mailing.html")
 
+
+    @login_required
+    def create_mailing(request):
+        if request.method == 'POST':
+            subject = request.POST['subject']
+            message = request.POST['message']
+            Mailing.objects.create(subject=subject, message=message, created_by=request.user)
+            return redirect('mailing_list')
+        return render(request, 'create_mailing.html')
 
 class MailingUpdateView(UpdateView):
     model = Mailing

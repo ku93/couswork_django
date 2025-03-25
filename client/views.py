@@ -4,13 +4,12 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
-
 from client.models import Client
 
 
 class ClientListView(ListView):
     model = Client
-    template_name = "client/client_list.html"
+template_name = "client/client_list.html"
 
     def get_queryset(self):
         clients = cache.get("client_list")
@@ -30,8 +29,7 @@ class ClientDetailView(DetailView):
             client = Client.objects.get(id=client_id)
             cache.set(f"client_{client_id}", client, timeout=60 * 15)
         return client
-
-
+      
 class ClientCreateView(CreateView):
     model = Client
     fields = "__all__"
@@ -51,6 +49,20 @@ class ClientCreateView(CreateView):
             return redirect("client_list")
         return render(request, "create_client.html")
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        cache.delete('client_list')
+        return response
+
+    @login_required
+    def create_client(request):
+        if request.method == 'POST':
+            name = request.POST['name']
+            email = request.POST['email']
+            Client.objects.create(name=name, email=email, created_by=request.user)
+            return redirect('client_list')
+        return render(request, 'create_client.html')
+
 
 class ClientUpdateView(UpdateView):
     model = Client
@@ -60,8 +72,20 @@ class ClientUpdateView(UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         client_id = self.object.id
-        cache.delete(f"client_{client_id}")
+cache.delete(f"client_{client_id}")
         cache.delete("client_list")
+        return response
+
+
+class ClientDeleteView(DeleteView):
+    model = Client
+    success_url = reverse_lazy("client:client_list")
+
+    def delete(self, request, *args, **kwargs):
+        client_id = self.get_object().id
+        response = super().delete(request, *args, **kwargs)
+        cache.delete(f'client_{client_id}')
+        cache.delete('client_list')
         return response
 
 
