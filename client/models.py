@@ -1,3 +1,4 @@
+from  users.models import User
 from django.db import models
 
 class Client(models.Model):
@@ -25,6 +26,7 @@ class Client(models.Model):
         verbose_name="Дата последнего изменения",
         help_text="Дата последнего изменения продукта",
     )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='clients', verbose_name='Владелец')
 
     class Meta:
         verbose_name = "Клиент"

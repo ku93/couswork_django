@@ -1,8 +1,9 @@
 import os
 
+from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.mail import send_mail
 from django.contrib import messages
 
@@ -11,21 +12,49 @@ from client.models import Client
 from mailing.models import Mailing, EmailStatistics
 from dotenv import load_dotenv
 
+from users.views import can_view_all_mailings, can_disable_mailings
+
 load_dotenv()
 
 class MailingListView(ListView):
     model = Mailing
     template_name = 'mailing_list.html'
 
+    @login_required
+    def mailing_list(request):
+        if can_view_all_mailings(request.user):
+            mailings = Mailing.objects.all()
+        else:
+            mailings = Mailing.objects.filter(created_by=request.user)
+        return render(request, 'mailing_list.html', {'mailings': mailings})
+
 class MailingDetailView(DetailView):
     model = Mailing
     template_name = 'mailing_detail.html'
+
+    @login_required
+    def disable_mailing(request, mailing_id):
+        if not can_disable_mailings(request.user):
+            return redirect('unauthorized')
+        mailing = get_object_or_404(Mailing, id=mailing_id)
+        mailing.is_active = False
+        mailing.save()
+        return redirect('mailing_list')
 
 class MailingCreateView(CreateView):
     model = Mailing
     fields = '__all__'
     success_url = '/'
     template_name = 'mailing_form.html'
+
+    @login_required
+    def create_mailing(request):
+        if request.method == 'POST':
+            subject = request.POST['subject']
+            message = request.POST['message']
+            Mailing.objects.create(subject=subject, message=message, created_by=request.user)
+            return redirect('mailing_list')
+        return render(request, 'create_mailing.html')
 
 class MailingUpdateView(UpdateView):
     model = Mailing
