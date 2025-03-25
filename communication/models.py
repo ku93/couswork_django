@@ -1,13 +1,15 @@
 from django.db import models
 
+
 class Communication(models.Model):
-    topic =models.CharField(
+    topic = models.CharField(
         max_length=100,
         verbose_name="Тема сообщения",
-        help_text="Укажите тему сообщения")
-    links =models.TextField(
-        verbose_name="Текст сообщения",
-        help_text="Добавьте текст сообщения")
+        help_text="Укажите тему сообщения",
+    )
+    links = models.TextField(
+        verbose_name="Текст сообщения", help_text="Добавьте текст сообщения"
+    )
 
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -20,7 +22,6 @@ class Communication(models.Model):
         verbose_name="Дата последнего изменения",
         help_text="Дата последнего изменения продукта",
     )
-
 
     class Meta:
         verbose_name = "Сообщение"
