@@ -9,7 +9,7 @@ from client.models import Client
 
 class ClientListView(ListView):
     model = Client
-template_name = "client/client_list.html"
+    template_name = "client/client_list.html"
 
     def get_queryset(self):
         clients = cache.get("client_list")
@@ -72,7 +72,7 @@ class ClientUpdateView(UpdateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         client_id = self.object.id
-cache.delete(f"client_{client_id}")
+        cache.delete(f"client_{client_id}")
         cache.delete("client_list")
         return response
 
