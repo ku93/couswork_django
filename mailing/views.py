@@ -1,106 +1,76 @@
 import os
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 from dotenv import load_dotenv
 
 from client.models import Client
-from mailing.models import EmailStatistics, Mailing
-from users.views import can_disable_mailings, can_view_all_mailings
+from mailing.forms import MailingForm
+from mailing.models import Mailing
 
 load_dotenv()
 
 
-class MailingListView(ListView):
+class MailingListView(LoginRequiredMixin, ListView):
     model = Mailing
     template_name = "mailing_list.html"
 
-    @login_required
-    def mailing_list(request):
-        if can_view_all_mailings(request.user):
-            mailings = Mailing.objects.all()
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.user.is_superuser:
+            return queryset
         else:
-            mailings = Mailing.objects.filter(created_by=request.user)
-        return render(request, "mailing_list.html", {"mailings": mailings})
+            return queryset.filter(owner=self.request.user)
 
 
-    @login_required
-    def mailing_list(request):
-        if can_view_all_mailings(request.user):
-            mailings = Mailing.objects.all()
-        else:
-            mailings = Mailing.objects.filter(created_by=request.user)
-        return render(request, 'mailing_list.html', {'mailings': mailings})
-
-class MailingDetailView(DetailView):
+@method_decorator(cache_page(60 * 15), name="dispatch")
+class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
     template_name = "mailing_detail.html"
 
-    @login_required
-    def disable_mailing(request, mailing_id):
-        if not can_disable_mailings(request.user):
-            return redirect("unauthorized")
-        mailing = get_object_or_404(Mailing, id=mailing_id)
-        mailing.is_active = False
-        mailing.save()
-        return redirect("mailing_list")
+    # @login_required
+    # def disable_mailing(request, mailing_id):
+    #     if not can_disable_mailings(request.user):
+    #         return redirect("unauthorized")
+    #     mailing = get_object_or_404(Mailing, id=mailing_id)
+    #     mailing.is_active = False
+    #     mailing.save()
+    #     return redirect("mailing_list")
 
 
-    @login_required
-    def disable_mailing(request, mailing_id):
-        if not can_disable_mailings(request.user):
-            return redirect('unauthorized')
-        mailing = get_object_or_404(Mailing, id=mailing_id)
-        mailing.is_active = False
-        mailing.save()
-        return redirect('mailing_list')
-
-class MailingCreateView(CreateView):
+class MailingCreateView(LoginRequiredMixin, CreateView):
     model = Mailing
-    fields = "__all__"
+    form_class = MailingForm
     success_url = "/"
     template_name = "mailing_form.html"
 
-    @login_required
-    def create_mailing(request):
-        if request.method == "POST":
-            subject = request.POST["subject"]
-            message = request.POST["message"]
-            Mailing.objects.create(
-                subject=subject, message=message, created_by=request.user
-            )
-            return redirect("mailing_list")
-        return render(request, "create_mailing.html")
+    def form_valid(self, form):
+        mailing = form.save()
+        mailing.owner = self.request.user
+        return super().form_valid(form)
 
 
-    @login_required
-    def create_mailing(request):
-        if request.method == 'POST':
-            subject = request.POST['subject']
-            message = request.POST['message']
-            Mailing.objects.create(subject=subject, message=message, created_by=request.user)
-            return redirect('mailing_list')
-        return render(request, 'create_mailing.html')
-
-class MailingUpdateView(UpdateView):
+class MailingUpdateView(LoginRequiredMixin, UpdateView):
     model = Mailing
-    fields = "__all__"
+    form_class = MailingForm
     success_url = "/"
     template_name = "mailing_form.html"
 
 
-class MailingDeleteView(DeleteView):
+class MailingDeleteView(LoginRequiredMixin, DeleteView):
     model = Mailing
     success_url = "/"
     template_name = "mailing_confirm_delete.html"
 
 
-class SendMailingView(View):
+class SendMailingView(LoginRequiredMixin, View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
         clients = Client.objects.all()
@@ -138,9 +108,9 @@ class HomeView(View):
         return render(request, "home.html", context)
 
 
-class EmailStatisticsView(ListView):
-    model = EmailStatistics
-    template_name = "email_statistics.html"
-
-    def get_queryset(self):
-        return EmailStatistics.objects.filter(user=self.request.user)
+# class EmailStatisticsView(LoginRequiredMixin, ListView):
+#     model = EmailStatistics
+#     template_name = "email_statistics.html"
+#
+#     def get_queryset(self):
+#         return EmailStatistics.objects.filter(user=self.request.user)

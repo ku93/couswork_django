@@ -36,7 +36,12 @@ class Mailing(models.Model):
         help_text="Дата последнего изменения продукта",
     )
     owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="mailings", verbose_name="Владелец"
+        User,
+        on_delete=models.CASCADE,
+        related_name="mailings",
+        verbose_name="Владелец",
+        null=True,
+        blank=True,
     )
 
     class Metta:
@@ -75,15 +80,15 @@ class MailingAttempt(models.Model):
         return f"{self.timestamp} - {self.status}"
 
 
-class EmailStatistics(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    successful_attempts = models.IntegerField(default=0)
-    failed_attempts = models.IntegerField(default=0)
-    total_sent = models.IntegerField(default=0)
-
-    class Metta:
-        verbose_name = "Статистика рассылки"
-        verbose_name_plural = "Статистики рассылки"
-
-    def __str__(self):
-        return f"Статистика для {self.user.email}"
+# class EmailStatistics(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     successful_attempts = models.IntegerField(default=0)
+#     failed_attempts = models.IntegerField(default=0)
+#     total_sent = models.IntegerField(default=0)
+#
+#     class Metta:
+#         verbose_name = "Статистика рассылки"
+#         verbose_name_plural = "Статистики рассылки"
+#
+#     def __str__(self):
+#         return f"Статистика для {self.user.email}"

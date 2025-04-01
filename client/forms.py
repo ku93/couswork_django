@@ -6,4 +6,4 @@ from client.models import Client
 class ClientForm(ModelForm):
     class Meta:
         model = Client
-        fields = "__all__"
+        exclude = ("owner",)

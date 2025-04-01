@@ -6,4 +6,4 @@ from communication.models import Communication
 class CommunicationForm(ModelForm):
     class Meta:
         model = Communication
-        fields = "__all__"
+        exclude = ("owner",)

@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 
 class Communication(models.Model):
     topic = models.CharField(
@@ -21,6 +23,14 @@ class Communication(models.Model):
         auto_now=True,
         verbose_name="Дата последнего изменения",
         help_text="Дата последнего изменения продукта",
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="communications",
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
     )
 
     class Meta:
